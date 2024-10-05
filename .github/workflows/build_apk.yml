@@ -48,13 +48,19 @@ jobs:
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
 
-      # Step 6: Rename the APK with the tag name
-      - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
+      # Step 6: Find the generated APK and rename it with the tag name
+      - name: Find and Rename APK
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/ -name "*.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "APK not found"
+            exit 1
+          fi
+          mv "$APK_PATH" "app/build/outputs/apk/release/notify-me-${GITHUB_REF_NAME}.apk"
 
       # Step 7: Upload APK to GitHub Actions Artifacts (Optional)
       - name: Upload APK Artifact
-        if: success() && steps.build.outputs.apk_exists == 'true'
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: notify-me-${{ github.ref_name }}.apk
@@ -74,7 +80,7 @@ jobs:
           prerelease: false
 
       - name: Upload APK to Release
-        if: success() && steps.build.outputs.apk_exists == 'true'
+        if: success()
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
