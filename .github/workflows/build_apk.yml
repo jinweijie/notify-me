@@ -45,7 +45,7 @@ jobs:
       # Step 5: Create a Keystore File
       - name: Create Keystore File
         run: |
-          mkdir -p $GITHUB_WORKSPACE/app
+          mkdir -p app
           echo "$NOTIFY_ME_KEYSTORE_BASE64" | tr -d '\n' | base64 -d > $GITHUB_WORKSPACE/app/keystore.jks
         env:
           NOTIFY_ME_KEYSTORE_BASE64: ${{ secrets.NOTIFY_ME_KEYSTORE_BASE64 }}
@@ -68,7 +68,7 @@ jobs:
             echo "APK not found"
             exit 1
           fi
-          mv "$APK_PATH" "$GITHUB_WORKSPACE/app/build/outputs/apk/release/notify-me-${GITHUB_REF_NAME}.apk"
+          mv "$APK_PATH" "app/build/outputs/apk/release/notify-me-${GITHUB_REF_NAME}.apk"
 
       # Step 8: Upload APK to GitHub Actions Artifacts (Optional)
       - name: Upload APK Artifact
@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: notify-me-${{ github.ref_name }}.apk
-          path: $GITHUB_WORKSPACE/app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
+          path: app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
           if-no-files-found: warn
 
       # Step 9: Create GitHub Release and upload the APK
@@ -96,6 +96,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: $GITHUB_WORKSPACE/app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
+          file: app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
           asset_name: notify-me-${{ github.ref_name }}.apk
           tag: ${{ github.ref }}
