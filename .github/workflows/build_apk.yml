@@ -45,6 +45,7 @@ jobs:
       # Step 5: Create a Keystore File
       - name: Create Keystore File
         run: |
+          mkdir -p app
           echo "$NOTIFY_ME_KEYSTORE_BASE64" | tr -d '\n' | base64 -d > app/keystore.jks
         env:
           NOTIFY_ME_KEYSTORE_BASE64: ${{ secrets.NOTIFY_ME_KEYSTORE_BASE64 }}
