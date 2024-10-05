@@ -27,13 +27,6 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      # Step 2.5: Decrypt the Keystore
-      - name: Decrypt Keystore
-        run: |
-          echo $NOTIFY_ME_KEYSTORE_BASE64 | base64 -d > keystore.jks
-        env:
-          NOTIFY_ME_KEYSTORE_BASE64: ${{ secrets.NOTIFY_ME_KEYSTORE_BASE64 }}
-
       # Step 3: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -49,17 +42,20 @@ jobs:
       - name: Grant execute permission for Gradlew
         run: chmod +x gradlew
 
-      # Step 5: Build the APK with signing credentials
+      # Step 5: Create a Keystore File
+      - name: Create Keystore File
+        run: |
+          echo "$NOTIFY_ME_KEYSTORE_BASE64" | tr -d '\n' | base64 -d > app/keystore.jks
+        env:
+          NOTIFY_ME_KEYSTORE_BASE64: ${{ secrets.NOTIFY_ME_KEYSTORE_BASE64 }}
+
+      # Step 6: Build the APK
       - name: Build APK
         run: ./gradlew assembleRelease
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
-          NOTIFY_ME_KEYSTORE_PATH: keystore.jks
-          NOTIFY_ME_KEYSTORE_PASSWORD: ${{ secrets.NOTIFY_ME_KEYSTORE_PASSWORD }}
-          NOTIFY_ME_KEY_ALIAS: ${{ secrets.NOTIFY_ME_KEY_ALIAS }}
-          NOTIFY_ME_KEY_PASSWORD: ${{ secrets.NOTIFY_ME_KEY_PASSWORD }}
 
-      # Step 6: Find the generated APK and rename it with the tag name
+      # Step 7: Find the generated APK and rename it with the tag name
       - name: Find and Rename APK
         run: |
           APK_PATH=$(find app/build/outputs/apk/ -name "*.apk" | head -n 1)
@@ -69,7 +65,7 @@ jobs:
           fi
           mv "$APK_PATH" "app/build/outputs/apk/release/notify-me-${GITHUB_REF_NAME}.apk"
 
-      # Step 7: Upload APK to GitHub Actions Artifacts (Optional)
+      # Step 8: Upload APK to GitHub Actions Artifacts (Optional)
       - name: Upload APK Artifact
         if: success()
         uses: actions/upload-artifact@v3
@@ -78,7 +74,7 @@ jobs:
           path: app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
           if-no-files-found: warn
 
-      # Step 8: Create GitHub Release and upload the APK
+      # Step 9: Create GitHub Release and upload the APK
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
