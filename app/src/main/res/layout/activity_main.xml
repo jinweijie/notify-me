@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_current_endpoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current Endpoint: "
+        android:textSize="16sp"
+        android:paddingBottom="16dp" />
+
+    <EditText
+        android:id="@+id/et_endpoint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter POST Endpoint"
+        android:inputType="textUri" />
+
+    <TextView
+        android:id="@+id/tv_current_device_key"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Device Key: "
+        android:textSize="16sp"
+        android:paddingBottom="16dp" />
+
+    <EditText
+        android:id="@+id/et_device_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Device Key"
+        android:inputType="textUri" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save Endpoint" />
+
+            <Button
+                android:id="@+id/btn_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:text="Test Notification" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
