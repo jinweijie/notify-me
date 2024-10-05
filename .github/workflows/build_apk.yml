@@ -34,18 +34,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Step 4: Build the APK
+      # Step 4: Grant execute permission for Gradlew
+      - name: Grant execute permission for Gradlew
+        run: chmod +x gradlew
+
+      # Step 5: Build the APK
       - name: Build APK
         run: ./gradlew assembleRelease
 
-      # Step 5: Upload APK to GitHub Actions Artifacts (Optional)
+      # Step 6: Upload APK to GitHub Actions Artifacts (Optional)
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v3
         with:
           name: app-release.apk
           path: app/build/outputs/apk/release/app-release.apk
 
-      # Step 6: Create GitHub Release and upload the APK
+      # Step 7: Create GitHub Release and upload the APK
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
