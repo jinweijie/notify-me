@@ -20,15 +20,32 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            // These environment variables must be provided by the GitHub Action or your local environment
+            val keystorePath = System.getenv("NOTIFY_ME_KEYSTORE_PATH")
+            if (keystorePath.isNullOrEmpty()) {
+                throw GradleException("NOTIFY_ME_KEYSTORE_PATH environment variable is not set")
+            }
+
+            keyAlias = System.getenv("NOTIFY_ME_KEY_ALIAS")
+            keyPassword = System.getenv("NOTIFY_ME_KEY_PASSWORD")
+            storeFile = file(keystorePath)
+            storePassword = System.getenv("NOTIFY_ME_KEYSTORE_PASSWORD")
+        }
+    }
+
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -50,7 +67,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

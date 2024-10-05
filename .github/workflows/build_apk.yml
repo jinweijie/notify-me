@@ -27,6 +27,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      # Step 2.5: Decrypt the Keystore
+      - name: Decrypt Keystore
+        run: |
+          echo $ANDROID_KEYSTORE_BASE64 | base64 -d > keystore.jks
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
       # Step 3: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
@@ -42,11 +49,15 @@ jobs:
       - name: Grant execute permission for Gradlew
         run: chmod +x gradlew
 
-      # Step 5: Build the APK
+      # Step 5: Build the APK with signing credentials
       - name: Build APK
         run: ./gradlew assembleRelease
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
+          KEYSTORE_PATH: keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       # Step 6: Find the generated APK and rename it with the tag name
       - name: Find and Rename APK
