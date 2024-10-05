@@ -45,13 +45,17 @@ jobs:
       # Step 5: Build the APK
       - name: Build APK
         run: ./gradlew assembleRelease
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
 
       # Step 6: Upload APK to GitHub Actions Artifacts (Optional)
       - name: Upload APK Artifact
+        if: success() && steps.build.outputs.apk_exists == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: app-release.apk
           path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: warn
 
       # Step 7: Create GitHub Release and upload the APK
       - name: Create Release
@@ -66,6 +70,7 @@ jobs:
           prerelease: false
 
       - name: Upload APK to Release
+        if: success() && steps.build.outputs.apk_exists == 'true'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
