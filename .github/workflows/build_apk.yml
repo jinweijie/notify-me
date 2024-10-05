@@ -56,6 +56,9 @@ jobs:
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
           NOTIFY_ME_KEYSTORE_PATH: app/keystore.jks
+          NOTIFY_ME_KEY_ALIAS: ${{ secrets.NOTIFY_ME_KEY_ALIAS }}
+          NOTIFY_ME_KEY_PASSWORD: ${{ secrets.NOTIFY_ME_KEY_PASSWORD }}
+          NOTIFY_ME_KEYSTORE_PASSWORD: ${{ secrets.NOTIFY_ME_KEYSTORE_PASSWORD }}
 
       # Step 7: Find the generated APK and rename it with the tag name
       - name: Find and Rename APK
