@@ -46,7 +46,7 @@ jobs:
       - name: Create Keystore File
         run: |
           mkdir -p app
-          echo "$NOTIFY_ME_KEYSTORE_BASE64" | tr -d '\n' | base64 -d > app/keystore.jks
+          echo "$NOTIFY_ME_KEYSTORE_BASE64" | tr -d '\n' | base64 -d > $GITHUB_WORKSPACE/app/keystore.jks
         env:
           NOTIFY_ME_KEYSTORE_BASE64: ${{ secrets.NOTIFY_ME_KEYSTORE_BASE64 }}
 
