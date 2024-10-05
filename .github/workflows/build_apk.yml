@@ -52,7 +52,7 @@ jobs:
 
       # Step 6: Build the APK
       - name: Build APK
-        run: ./gradlew assembleRelease -PkeystorePath=app/keystore.jks
+        run: ./gradlew assembleRelease -PkeystorePath=$GITHUB_WORKSPACE/app/keystore.jks
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
           NOTIFY_ME_KEYSTORE_PATH: $GITHUB_WORKSPACE/app/keystore.jks
