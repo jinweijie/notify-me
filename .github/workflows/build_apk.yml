@@ -46,16 +46,16 @@ jobs:
       - name: Create Keystore File
         run: |
           mkdir -p app
-          echo "$NOTIFY_ME_KEYSTORE_BASE64" | tr -d '\n' | base64 -d > $GITHUB_WORKSPACE/app/keystore.jks
+          echo "$NOTIFY_ME_KEYSTORE_BASE64" | tr -d '\n' | base64 -d > ${{ github.workspace }}/app/keystore.jks
         env:
           NOTIFY_ME_KEYSTORE_BASE64: ${{ secrets.NOTIFY_ME_KEYSTORE_BASE64 }}
 
       # Step 6: Build the APK
       - name: Build APK
-        run: ./gradlew assembleRelease -PkeystorePath=$GITHUB_WORKSPACE/app/keystore.jks
+        run: ./gradlew assembleRelease -PkeystorePath=${{ github.workspace }}/app/keystore.jks
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
-          NOTIFY_ME_KEYSTORE_PATH: $GITHUB_WORKSPACE/app/keystore.jks
+          NOTIFY_ME_KEYSTORE_PATH: ${{ github.workspace }}/app/keystore.jks
           NOTIFY_ME_KEY_ALIAS: ${{ secrets.NOTIFY_ME_KEY_ALIAS }}
           NOTIFY_ME_KEY_PASSWORD: ${{ secrets.NOTIFY_ME_KEY_PASSWORD }}
           NOTIFY_ME_KEYSTORE_PASSWORD: ${{ secrets.NOTIFY_ME_KEYSTORE_PASSWORD }}
