@@ -2,8 +2,8 @@ name: Android APK Build & Release
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 'release-*'
   workflow_dispatch:
 
 permissions:
@@ -48,24 +48,28 @@ jobs:
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Zulu_jdk/17.0.12-7/x64
 
-      # Step 6: Upload APK to GitHub Actions Artifacts (Optional)
+      # Step 6: Rename the APK with the tag name
+      - name: Rename APK
+        run: mv app/build/outputs/apk/release/app-release.apk app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
+
+      # Step 7: Upload APK to GitHub Actions Artifacts (Optional)
       - name: Upload APK Artifact
         if: success() && steps.build.outputs.apk_exists == 'true'
         uses: actions/upload-artifact@v3
         with:
-          name: app-release.apk
-          path: app/build/outputs/apk/release/app-release.apk
+          name: notify-me-${{ github.ref_name }}.apk
+          path: app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
           if-no-files-found: warn
 
-      # Step 7: Create GitHub Release and upload the APK
+      # Step 8: Create GitHub Release and upload the APK
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
-          release_name: Release ${{ github.sha }}
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
 
@@ -74,6 +78,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: app/build/outputs/apk/release/app-release.apk
-          asset_name: app-release.apk
-          tag: ${{ github.sha }}
+          file: app/build/outputs/apk/release/notify-me-${{ github.ref_name }}.apk
+          asset_name: notify-me-${{ github.ref_name }}.apk
+          tag: ${{ github.ref }}
