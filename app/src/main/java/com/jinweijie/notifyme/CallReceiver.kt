@@ -28,7 +28,7 @@ class CallReceiver : BroadcastReceiver() {
                     Log.d("CallReceiver", "Incoming call from: $incomingNumber")
                     Toast.makeText(context, "Incoming call from: $incomingNumber", Toast.LENGTH_LONG).show()
 
-                    val sdf: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
+                    val sdf: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                     val currentTime: String = sdf.format(Date())
                     // Post the data
                     Utils.sendNotification(incomingNumber!!, "Call from $incomingNumber @ $currentTime" , "Call", context)
