@@ -16,13 +16,13 @@ class SmsReceiver : BroadcastReceiver() {
                     SmsMessage.createFromPdu(it as ByteArray)
                 }.toTypedArray()
                 for (msg in msgs) {
-                    val sender = msg?.originatingAddress
-                    val message = msg?.messageBody
+                    val sender = msg?.originatingAddress ?: "Unknown Sender"
+                    val message = msg?.messageBody ?: "No Message Content"
 
                     Toast.makeText(context, "SMS received from $sender: $message", Toast.LENGTH_LONG).show()
 
                     // Post the data
-                    Utils.postToServer(sender, message, "SMS", context)
+                    Utils.sendNotification(sender, message, "SMS", context)
                 }
             }
         }

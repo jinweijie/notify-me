@@ -1,44 +1,43 @@
 package com.jinweijie.notifyme
 
-import android.content.pm.PackageManager
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.jinweijie.notifyme.ui.theme.NotifyMeTheme
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
-import android.os.PowerManager
-import android.provider.Settings
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.widget.*
+import androidx.activity.ComponentActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
 
-    private val SMS_PERMISSION_CODE = 101
-    private val PHONE_PERMISSION_CODE = 102
+    companion object {
+        private const val SMS_PERMISSION_CODE = 101
+        private const val PHONE_PERMISSION_CODE = 102
+    }
 
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var tvCurrentEndpoint: TextView
+
+    // Bark UI elements
+    private lateinit var cbEnableBark: CheckBox
+    private lateinit var layoutBarkContent: LinearLayout
     private lateinit var etEndpoint: EditText
-    private lateinit var tvCurrentDeviceKey: TextView
     private lateinit var etDeviceKey: EditText
-    private lateinit var btnSave: Button
-    private lateinit var btnTest: Button
+    private lateinit var btnSaveBark: Button
+    private lateinit var btnTestBark: Button
+
+    // Email UI elements
+    private lateinit var cbEnableEmail: CheckBox
+    private lateinit var layoutEmailContent: LinearLayout
+    private lateinit var etEmailSmtp: EditText
+    private lateinit var etEmailPort: EditText
+    private lateinit var etEmailUsername: EditText
+    private lateinit var etEmailPassword: EditText
+    private lateinit var etEmailRecipient: EditText
+    private lateinit var cbUseSSL: CheckBox
+    private lateinit var btnSaveEmail: Button
+    private lateinit var btnTestEmail: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,47 +49,132 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun initializeUi() {
-        // Set the content view to the layout you created
         setContentView(R.layout.activity_main)
 
-        // Initialize UI elements
-        tvCurrentEndpoint = findViewById(R.id.tv_current_endpoint)
+        // Initialize Bark UI elements
+        cbEnableBark = findViewById(R.id.cb_enable_bark)
+        layoutBarkContent = findViewById(R.id.layout_bark_content)
         etEndpoint = findViewById(R.id.et_endpoint)
-        tvCurrentDeviceKey = findViewById(R.id.tv_current_device_key)
         etDeviceKey = findViewById(R.id.et_device_key)
-        btnSave = findViewById(R.id.btn_save)
-        btnTest = findViewById(R.id.btn_test)
+        btnSaveBark = findViewById(R.id.btn_save_bark)
+        btnTestBark = findViewById(R.id.btn_test_bark)
+
+        // Initialize Email UI elements
+        cbEnableEmail = findViewById(R.id.cb_enable_email)
+        layoutEmailContent = findViewById(R.id.layout_email_content)
+        etEmailSmtp = findViewById(R.id.et_email_smtp)
+        etEmailPort = findViewById(R.id.et_email_port)
+        etEmailUsername = findViewById(R.id.et_email_username)
+        etEmailPassword = findViewById(R.id.et_email_password)
+        etEmailRecipient = findViewById(R.id.et_email_recipient)
+        cbUseSSL = findViewById(R.id.cb_use_ssl)
+        btnSaveEmail = findViewById(R.id.btn_save_email)
+        btnTestEmail = findViewById(R.id.btn_test_email)
 
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
 
-        // Load and display the current endpoint
-        val savedEndpoint = sharedPreferences.getString("endpoint", "http://default-url.com")
-        val savedDeviceKey = sharedPreferences.getString("device_key", "<your_device_key>")
-        tvCurrentEndpoint.text = "Current Endpoint: $savedEndpoint"
-        tvCurrentDeviceKey.text =  "Current DeviceKey: $savedDeviceKey"
+        // Load and display the current settings
+        loadSavedSettings()
 
-        // Set click listener on the Save button
-        btnSave.setOnClickListener {
-            val newEndpoint = etEndpoint.text.toString().trim()
-            if (newEndpoint.isNotEmpty()) {
-                saveConfig("endpoint", newEndpoint)
-                tvCurrentEndpoint.text = "Current Endpoint: $newEndpoint"
-            }
+        // Set click listener on the Save button for Bark configuration
+        btnSaveBark.setOnClickListener {
+            saveBarkSettings()
 
-            val newDeviceKey = etDeviceKey.text.toString().trim()
-            if (newDeviceKey.isNotEmpty()) {
-                saveConfig("device_key", newDeviceKey)
-                tvCurrentDeviceKey.text = "Current Device Key: $newDeviceKey"
-            }
-
-            Toast.makeText(this, "Settings Saved.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Bark settings saved.", Toast.LENGTH_LONG).show()
         }
 
-        btnTest.setOnClickListener {
-            Utils.postToServer("Tester", "This is Test message", "SMS", this)
+        // Set click listener on the Test button for Bark
+        btnTestBark.setOnClickListener {
+            saveBarkSettings()
+
+            Utils.sendBark("Tester", "This is a test message", "SMS", this)
             Toast.makeText(this, "Test notification sent.", Toast.LENGTH_LONG).show()
         }
+
+        // Set click listener on the Save button for Email configuration
+        btnSaveEmail.setOnClickListener {
+            saveEmailSettings()
+            Toast.makeText(this, "Email settings saved.", Toast.LENGTH_LONG).show()
+        }
+
+        // Set click listener on the Test button for Email
+        btnTestEmail.setOnClickListener {
+            saveEmailSettings()
+
+            Utils.sendEmail("Tester", "This is a test message", "SMS", this)
+            Toast.makeText(this, "Test email sent.", Toast.LENGTH_LONG).show()
+        }
+
+        // Set change listeners for checkboxes
+        cbEnableBark.setOnCheckedChangeListener { _, isChecked ->
+            layoutBarkContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
+            saveBooleanConfig("enable_bark", isChecked)
+        }
+
+        cbEnableEmail.setOnCheckedChangeListener { _, isChecked ->
+            layoutEmailContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
+            saveBooleanConfig("enable_email", isChecked)
+        }
+    }
+
+    private fun saveBarkSettings() {
+        val newEndpoint = etEndpoint.text.toString().trim()
+        if (newEndpoint.isNotEmpty()) {
+            saveConfig("endpoint", newEndpoint)
+        }
+
+        val newDeviceKey = etDeviceKey.text.toString().trim()
+        if (newDeviceKey.isNotEmpty()) {
+            saveConfig("device_key", newDeviceKey)
+        }
+    }
+
+    private fun saveEmailSettings() {
+        val smtpServer = etEmailSmtp.text.toString().trim()
+        val useSSL = cbUseSSL.isChecked
+        val port = etEmailPort.text.toString().trim()
+        val username = etEmailUsername.text.toString().trim()
+        val password = etEmailPassword.text.toString().trim()
+        val recipient = etEmailRecipient.text.toString().trim()
+
+        saveConfig("email_smtp", smtpServer)
+        saveBooleanConfig("email_use_ssl", useSSL)
+        saveConfig("email_port", port)
+        saveConfig("email_username", username)
+        saveConfig("email_password", password)
+        saveConfig("email_recipient", recipient)
+    }
+
+    private fun loadSavedSettings() {
+        // Load Bark settings
+        val isBarkEnabled = sharedPreferences.getBoolean("enable_bark", false)
+        cbEnableBark.isChecked = isBarkEnabled
+        layoutBarkContent.visibility = if (isBarkEnabled) LinearLayout.VISIBLE else LinearLayout.GONE
+
+        val savedEndpoint = sharedPreferences.getString("endpoint", "")
+        val savedDeviceKey = sharedPreferences.getString("device_key", "")
+        etEndpoint.setText(savedEndpoint)
+        etDeviceKey.setText(savedDeviceKey)
+
+        // Load Email settings
+        val isEmailEnabled = sharedPreferences.getBoolean("enable_email", false)
+        cbEnableEmail.isChecked = isEmailEnabled
+        layoutEmailContent.visibility = if (isEmailEnabled) LinearLayout.VISIBLE else LinearLayout.GONE
+
+        val smtpServer = sharedPreferences.getString("email_smtp", "")
+        val useSSL = sharedPreferences.getBoolean("email_use_ssl", false)
+        val port = sharedPreferences.getString("email_port", "")
+        val username = sharedPreferences.getString("email_username", "")
+        val password = sharedPreferences.getString("email_password", "")
+        val recipient = sharedPreferences.getString("email_recipient", "")
+
+        etEmailSmtp.setText(smtpServer)
+        cbUseSSL.isChecked = useSSL
+        etEmailPort.setText(port)
+        etEmailUsername.setText(username)
+        etEmailPassword.setText(password)
+        etEmailRecipient.setText(recipient)
     }
 
     private fun saveConfig(key: String, value: String) {
@@ -99,16 +183,21 @@ class MainActivity : ComponentActivity() {
         editor.apply()
     }
 
-    private fun checkAndRequestSmsPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS)
-            != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
-            != PackageManager.PERMISSION_GRANTED) {
+    private fun saveBooleanConfig(key: String, value: Boolean) {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(key, value)
+        editor.apply()
+    }
 
-            // Request the permissions
-            ActivityCompat.requestPermissions(this,
+    private fun checkAndRequestSmsPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(
+                this,
                 arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS),
-                SMS_PERMISSION_CODE)
+                SMS_PERMISSION_CODE
+            )
         }
     }
 
@@ -116,10 +205,11 @@ class MainActivity : ComponentActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(
+                this,
                 arrayOf(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CALL_LOG),
-                PHONE_PERMISSION_CODE)
+                PHONE_PERMISSION_CODE
+            )
         }
     }
-
 }

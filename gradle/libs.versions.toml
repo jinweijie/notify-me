@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.1"
+androidMail = "1.6.7"
 kotlin = "1.9.0"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -11,6 +12,8 @@ composeBom = "2024.04.01"
 volley = "1.2.1"
 
 [libraries]
+android-activation = { module = "com.sun.mail:android-activation", version.ref = "androidMail" }
+android-mail = { module = "com.sun.mail:android-mail", version.ref = "androidMail" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

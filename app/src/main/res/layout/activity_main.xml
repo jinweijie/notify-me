@@ -1,66 +1,222 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_current_endpoint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Current Endpoint: "
-        android:textSize="16sp"
-        android:paddingBottom="16dp" />
-
-    <EditText
-        android:id="@+id/et_endpoint"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter POST Endpoint"
-        android:inputType="textUri" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tv_current_device_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Device Key: "
-        android:textSize="16sp"
-        android:paddingBottom="16dp" />
-
-    <EditText
-        android:id="@+id/et_device_key"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Device Key"
-        android:inputType="textUri" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
-
+        <!-- Bark Configuration Section -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
 
-            <Button
-                android:id="@+id/btn_save"
+            <CheckBox
+                android:id="@+id/cb_enable_bark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save Endpoint" />
+                android:text="Enable Bark Notification" />
 
-            <Button
-                android:id="@+id/btn_test"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/layout_bark_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:text="Test Notification" />
+                android:orientation="vertical"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_bark_section_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bark Configuration"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_current_endpoint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Current Endpoint: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_endpoint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter POST Endpoint"
+                    android:inputType="textUri" />
+
+                <TextView
+                    android:id="@+id/tv_current_device_key"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Device Key: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_device_key"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Device Key"
+                    android:inputType="textUri" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <Button
+                        android:id="@+id/btn_save_bark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Save Endpoint" />
+
+                    <Button
+                        android:id="@+id/btn_test_bark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Test Notification" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
-    </RelativeLayout>
+        <!-- Email Configuration Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
 
-</LinearLayout>
+            <CheckBox
+                android:id="@+id/cb_enable_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable Email Notification" />
+
+            <LinearLayout
+                android:id="@+id/layout_email_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_email_section_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email Configuration"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_email_smtp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SMTP Server: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_email_smtp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter SMTP Server" />
+
+                <CheckBox
+                    android:id="@+id/cb_use_ssl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Use SSL for Email" />
+
+                <TextView
+                    android:id="@+id/tv_email_port"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Port: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_email_port"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Port"
+                    android:inputType="number" />
+
+                <TextView
+                    android:id="@+id/tv_email_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Username: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_email_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Username" />
+
+                <TextView
+                    android:id="@+id/tv_email_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Password: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_email_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Password"
+                    android:inputType="textPassword" />
+
+                <TextView
+                    android:id="@+id/tv_email_recipient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recipient: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_email_recipient"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Recipient Email" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <Button
+                        android:id="@+id/btn_save_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Save Email Settings" />
+
+                    <Button
+                        android:id="@+id/btn_test_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Test Email" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -7,9 +7,35 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
+import java.util.Properties
+import javax.mail.Message
+import javax.mail.MessagingException
+import javax.mail.PasswordAuthentication
+import javax.mail.Session
+import javax.mail.Transport
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
+
 object Utils {
 
-    fun postToServer(sender: String?, message: String?, type: String, context: Context?) {
+    fun sendNotification(sender: String, message: String, type: String, context: Context?){
+        if (context == null) {
+            Log.e("sendNotification", "Context is null")
+            return
+        }
+
+        val sharedPreferences = context.getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
+        val isBarkEnabled = sharedPreferences.getBoolean("enable_bark", false)
+        val isEmailEnabled = sharedPreferences.getBoolean("enable_email", false)
+
+        if(isBarkEnabled)
+            sendBark(sender, message, type, context)
+
+        if(isEmailEnabled)
+            sendEmail(sender, message, type, context)
+    }
+
+    fun sendBark(sender: String, message: String, type: String, context: Context?) {
         // Run network operation in a background thread
         Thread {
             try {
@@ -90,5 +116,68 @@ object Utils {
                 Log.e("postToServer", "Unexpected error", e)
             }
         }.start() // Starting the thread
+    }
+
+    fun sendEmail(mailSubject: String, message: String, type: String, context: Context?) {
+        if (context == null) {
+            Log.e("sendEmail", "Context is null")
+            return
+        }
+
+        // Get email settings from SharedPreferences
+        val sharedPreferences = context.getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
+        val smtpServer = sharedPreferences.getString("email_smtp", null)
+        val useSSL = sharedPreferences.getBoolean("email_use_ssl", false)
+        val port = sharedPreferences.getString("email_port", null)
+        val username = sharedPreferences.getString("email_username", null)
+        val password = sharedPreferences.getString("email_password", null)
+        val recipient = sharedPreferences.getString("email_recipient", null)
+
+        if (smtpServer.isNullOrEmpty() || port.isNullOrEmpty() || username.isNullOrEmpty() || password.isNullOrEmpty()) {
+            Log.e("sendEmail", "Email settings are not properly configured.")
+            return
+        }
+
+        // Set up properties for SMTP
+        val props = Properties().apply {
+            put("mail.smtp.auth", "true")
+            put("mail.smtp.host", smtpServer)
+            put("mail.smtp.port", port)
+
+            if (useSSL) {
+                put("mail.smtp.socketFactory.port", port)
+                put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
+                put("mail.smtp.socketFactory.fallback", "false")
+            } else {
+                put("mail.smtp.starttls.enable", "true")  // Use STARTTLS if SSL is not enabled
+            }
+        }
+
+        // Run the email sending operation in a new thread
+        Thread {
+            try {
+                // Create a session with the provided username and password
+                val session = Session.getInstance(props, object : javax.mail.Authenticator() {
+                    override fun getPasswordAuthentication(): PasswordAuthentication {
+                        return PasswordAuthentication(username, password)
+                    }
+                })
+
+                // Create a new email message
+                val mimeMessage = MimeMessage(session).apply {
+                    setFrom(InternetAddress(username))
+                    setRecipient(Message.RecipientType.TO, InternetAddress(recipient))
+                    subject = "[$type] $mailSubject"
+                    setText(message)
+                }
+
+                // Send the email
+                Transport.send(mimeMessage)
+                Log.i("sendEmail", "Email sent successfully.")
+            } catch (e: MessagingException) {
+                Log.e("sendEmail", "Error sending email: ${e.message}")
+                e.printStackTrace()
+            }
+        }.start()
     }
 }

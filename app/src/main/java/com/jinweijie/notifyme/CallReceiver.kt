@@ -31,7 +31,7 @@ class CallReceiver : BroadcastReceiver() {
                     val sdf: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault())
                     val currentTime: String = sdf.format(Date())
                     // Post the data
-                    Utils.postToServer(incomingNumber, "Call from $incomingNumber @ $currentTime" , "Call", context)
+                    Utils.sendNotification(incomingNumber!!, "Call from $incomingNumber @ $currentTime" , "Call", context)
                 } else {
                     Log.d("CallReceiver", "Incoming call number is null or empty.")
                 }

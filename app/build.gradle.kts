@@ -62,6 +62,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/NOTICE.md"
+            excludes += "META-INF/LICENSE.md"
         }
     }
 }
@@ -75,11 +77,20 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    // JavaMail API for sending emails
+    implementation(libs.android.mail)
+    implementation(libs.android.activation)
+
+    // Test dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
+    // Debug dependencies
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
+
