@@ -12,15 +12,15 @@ This Android application captures incoming calls and SMS messages, and forwards 
 
 __App Screen__
 
-![App Screen](./screenshots/screenshot1.png){height=300}
+<img src="./screenshots/screenshot1.png" height="300">
 
 __Notification Emails__
 
-![Notification Emails](./screenshots/screenshot2.png){height=300}
+<img src="./screenshots/screenshot2.png" height="300">
 
 __Bark Notifications__
 
-![Bark Notifications](./screenshots/screenshot3.png){height=300}
+<img src="./screenshots/screenshot3.png" height="300">
 
 ## Prerequisites (Optional if only use Email notification)
 1. **Bark Server Setup**: Set up your Bark server by following the instructions provided in the [Bark Server GitHub repository](https://github.com/Finb/bark-server/blob/master/README.md).
