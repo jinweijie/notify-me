@@ -15,14 +15,29 @@ class SmsReceiver : BroadcastReceiver() {
                 val msgs: Array<SmsMessage?> = pdus.map {
                     SmsMessage.createFromPdu(it as ByteArray)
                 }.toTypedArray()
+
+                // Grouping messages by sender
+                val messageMap = mutableMapOf<String, StringBuilder>()
+
                 for (msg in msgs) {
                     val sender = msg?.originatingAddress ?: "Unknown Sender"
                     val message = msg?.messageBody ?: "No Message Content"
 
-                    Toast.makeText(context, "SMS received from $sender: $message", Toast.LENGTH_LONG).show()
+                    // Append message to the sender in the map
+                    if (messageMap.containsKey(sender)) {
+                        messageMap[sender]?.append(message)
+                    } else {
+                        messageMap[sender] = StringBuilder(message)
+                    }
+                }
+
+                // Post the concatenated messages per sender
+                for ((sender, messageBuilder) in messageMap) {
+                    val concatenatedMessage = messageBuilder.toString()
+                    Toast.makeText(context, "SMS received from $sender: $concatenatedMessage", Toast.LENGTH_LONG).show()
 
                     // Post the data
-                    Utils.sendNotification(sender, message, "SMS", context)
+                    Utils.sendNotification(sender, concatenatedMessage, "SMS", context)
                 }
             }
         }
