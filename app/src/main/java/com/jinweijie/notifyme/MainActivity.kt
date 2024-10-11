@@ -39,6 +39,14 @@ class MainActivity : ComponentActivity() {
     private lateinit var btnSaveEmail: Button
     private lateinit var btnTestEmail: Button
 
+    // Webhook UI elements
+    private lateinit var cbEnableWebhook: CheckBox
+    private lateinit var layoutWebhookContent: LinearLayout
+    private lateinit var etWebhookEndpoint: EditText
+    private lateinit var etWebhookHeaders: EditText
+    private lateinit var btnSaveWebhook: Button
+    private lateinit var btnTestWebhook: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -70,6 +78,14 @@ class MainActivity : ComponentActivity() {
         cbUseSSL = findViewById(R.id.cb_use_ssl)
         btnSaveEmail = findViewById(R.id.btn_save_email)
         btnTestEmail = findViewById(R.id.btn_test_email)
+
+        // Initialize Webhook UI elements
+        cbEnableWebhook = findViewById(R.id.cb_enable_webhook)
+        layoutWebhookContent = findViewById(R.id.layout_webhook_content)
+        etWebhookEndpoint = findViewById(R.id.et_webhook_endpoint)
+        etWebhookHeaders = findViewById(R.id.et_webhook_headers)
+        btnSaveWebhook = findViewById(R.id.btn_save_webhook)
+        btnTestWebhook = findViewById(R.id.btn_test_webhook)
 
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
@@ -106,6 +122,20 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Test email sent.", Toast.LENGTH_LONG).show()
         }
 
+        // Set click listener on the Save button for Webhook configuration
+        btnSaveWebhook.setOnClickListener {
+            saveWebhookSettings()
+            Toast.makeText(this, "Webhook settings saved.", Toast.LENGTH_LONG).show()
+        }
+
+        // Set click listener on the Test button for Webhook
+        btnTestWebhook.setOnClickListener {
+            saveWebhookSettings()
+
+            Utils.sendWebhook("Tester", "This is a test message", "SMS", this)
+            Toast.makeText(this, "Test webhook sent.", Toast.LENGTH_LONG).show()
+        }
+
         // Set change listeners for checkboxes
         cbEnableBark.setOnCheckedChangeListener { _, isChecked ->
             layoutBarkContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
@@ -115,6 +145,11 @@ class MainActivity : ComponentActivity() {
         cbEnableEmail.setOnCheckedChangeListener { _, isChecked ->
             layoutEmailContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
             saveBooleanConfig("enable_email", isChecked)
+        }
+
+        cbEnableWebhook.setOnCheckedChangeListener { _, isChecked ->
+            layoutWebhookContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
+            saveBooleanConfig("enable_webhook", isChecked)
         }
     }
 
@@ -146,6 +181,16 @@ class MainActivity : ComponentActivity() {
         saveConfig("email_recipient", recipient)
     }
 
+    private fun saveWebhookSettings() {
+        val webhookEndpoint = etWebhookEndpoint.text.toString().trim()
+        if (webhookEndpoint.isNotEmpty()) {
+            saveConfig("webhook_endpoint", webhookEndpoint)
+        }
+
+        val webhookHeaders = etWebhookHeaders.text.toString().trim()
+        saveConfig("webhook_headers", webhookHeaders)
+    }
+
     private fun loadSavedSettings() {
         // Load Bark settings
         val isBarkEnabled = sharedPreferences.getBoolean("enable_bark", false)
@@ -175,6 +220,17 @@ class MainActivity : ComponentActivity() {
         etEmailUsername.setText(username)
         etEmailPassword.setText(password)
         etEmailRecipient.setText(recipient)
+
+        // Load Webhook settings
+        val isWebhookEnabled = sharedPreferences.getBoolean("enable_webhook", false)
+        cbEnableWebhook.isChecked = isWebhookEnabled
+        layoutWebhookContent.visibility = if (isWebhookEnabled) LinearLayout.VISIBLE else LinearLayout.GONE
+
+        val webhookEndpoint = sharedPreferences.getString("webhook_endpoint", "")
+        val webhookHeaders = sharedPreferences.getString("webhook_headers", "")
+
+        etWebhookEndpoint.setText(webhookEndpoint)
+        etWebhookHeaders.setText(webhookHeaders)
     }
 
     private fun saveConfig(key: String, value: String) {

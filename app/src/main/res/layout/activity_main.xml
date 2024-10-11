@@ -218,5 +218,86 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
+        <!-- Webhook Configuration Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
+
+            <CheckBox
+                android:id="@+id/cb_enable_webhook"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable Webhook Notification" />
+
+            <LinearLayout
+                android:id="@+id/layout_webhook_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_webhook_section_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Webhook Configuration"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_webhook_endpoint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Webhook Endpoint URL: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_webhook_endpoint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Webhook Endpoint URL"
+                    android:inputType="textUri" />
+
+                <TextView
+                    android:id="@+id/tv_webhook_headers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Webhook Headers (optional): "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_webhook_headers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Headers in JSON Format"
+                    android:inputType="textMultiLine" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <Button
+                        android:id="@+id/btn_save_webhook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Save Webhook Settings" />
+
+                    <Button
+                        android:id="@+id/btn_test_webhook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Test Webhook" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
