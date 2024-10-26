@@ -8,6 +8,7 @@ This Android application captures incoming calls and SMS messages, and forwards 
 - Send email notifications with call and SMS information.
 - Forward call and SMS information to a custom webhook endpoint.
 - Receive notifications on other devices using the Bark app.
+- Dual SIM card support.
 
 ## Screenshots
 
@@ -77,3 +78,5 @@ __Webhook Notifications__
 - Check the Bark server or webhook setup to ensure it's correctly configured to accept forwarded messages.
 - Verify that the email configuration is correct and that the app can access the internet to send emails.
 
+# License
+This project is licensed under the [WTFPL License](http://www.wtfpl.net). This license allows you to freely use, modify, and distribute the software. For more details, see the [WTFPL License](http://www.wtfpl.net)
