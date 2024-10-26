@@ -1,7 +1,9 @@
 package com.jinweijie.notifyme
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.telephony.SubscriptionManager
 import android.util.Log
 import org.json.JSONException
 import org.json.JSONObject
@@ -278,4 +280,17 @@ object Utils {
         }.start() // Starting the thread
     }
 
+    @SuppressLint("MissingPermission")
+    fun getSimSlotIndex(context: Context?, subId: Int): Int {
+        val subscriptionManager = context?.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+        val subscriptionInfo = subscriptionManager.getActiveSubscriptionInfo(subId)
+        return subscriptionInfo?.simSlotIndex ?: -1
+    }
+
+    @SuppressLint("MissingPermission")
+    fun isDualSimDevice(context: Context?): Boolean {
+        val subscriptionManager = context?.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+        val activeSubscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+        return (activeSubscriptionInfoList?.size ?: 0) > 1
+    }
 }

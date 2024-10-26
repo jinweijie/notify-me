@@ -12,18 +12,25 @@ class SmsReceiver : BroadcastReceiver() {
             val bundle = intent?.extras
             if (bundle != null) {
                 val pdus = bundle["pdus"] as Array<*>
+                val format = bundle.getString("format") // for CDMA
+
                 val msgs: Array<SmsMessage?> = pdus.map {
-                    SmsMessage.createFromPdu(it as ByteArray)
+                    SmsMessage.createFromPdu(it as ByteArray, format)
                 }.toTypedArray()
 
-                // Grouping messages by sender
                 val messageMap = mutableMapOf<String, StringBuilder>()
+
+                // Retrieve the subscription ID to determine the SIM slot
+                val subId = intent.getIntExtra("subscription", -1)
+                val simSlotIndex = Utils.getSimSlotIndex(context, subId)
+
+                // Check if the device has dual SIM
+                val isDualSim = Utils.isDualSimDevice(context)
 
                 for (msg in msgs) {
                     val sender = msg?.originatingAddress ?: "Unknown Sender"
                     val message = msg?.messageBody ?: "No Message Content"
 
-                    // Append message to the sender in the map
                     if (messageMap.containsKey(sender)) {
                         messageMap[sender]?.append(message)
                     } else {
@@ -31,13 +38,16 @@ class SmsReceiver : BroadcastReceiver() {
                     }
                 }
 
-                // Post the concatenated messages per sender
                 for ((sender, messageBuilder) in messageMap) {
                     val concatenatedMessage = messageBuilder.toString()
-                    Toast.makeText(context, "SMS received from $sender: $concatenatedMessage", Toast.LENGTH_LONG).show()
 
-                    // Post the data
-                    Utils.sendNotification(sender, concatenatedMessage, "SMS", context)
+                    // Add SIM slot prefix only if the device is dual SIM
+                    val prefix = if (isDualSim) "SIM $simSlotIndex: " else ""
+                    val displayMessage = "$prefix$concatenatedMessage"
+
+                    Toast.makeText(context, displayMessage, Toast.LENGTH_LONG).show()
+
+                    Utils.sendNotification(sender, displayMessage, "SMS", context)
                 }
             }
         }

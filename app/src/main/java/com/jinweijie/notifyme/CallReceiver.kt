@@ -19,19 +19,31 @@ class CallReceiver : BroadcastReceiver() {
         if (intent?.action.equals("android.intent.action.PHONE_STATE")) {
             val stateStr = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
 
+            // Get subscription ID to check which SIM is active
+            val subId = intent?.getIntExtra("subscription", -1)
+            val simSlotIndex = Utils.getSimSlotIndex(context, subId!!)
+
+            // Check if the device has dual SIM
+            val isDualSim = Utils.isDualSimDevice(context)
+
             // Capture incoming number only when the phone is ringing
             if (TelephonyManager.EXTRA_STATE_RINGING == stateStr) {
-                incomingNumber = intent?.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
+                incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
 
                 // Log and show the incoming number when phone is ringing
                 if (!incomingNumber.isNullOrEmpty()) {
-                    Log.d("CallReceiver", "Incoming call from: $incomingNumber")
-                    Toast.makeText(context, "Incoming call from: $incomingNumber", Toast.LENGTH_LONG).show()
+                    // Add SIM slot prefix only if the device is dual SIM
+                    val prefix = if (isDualSim) "SIM $simSlotIndex: " else ""
+                    val displayMessage = "$prefix$incomingNumber"
 
-                    val sdf: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    val currentTime: String = sdf.format(Date())
+                    Log.d("CallReceiver", "Incoming call from $displayMessage")
+                    Toast.makeText(context, "Incoming call from $displayMessage", Toast.LENGTH_LONG).show()
+
+                    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    val currentTime = sdf.format(Date())
+
                     // Post the data
-                    Utils.sendNotification(incomingNumber!!, "Call from $incomingNumber @ $currentTime" , "Call", context)
+                    Utils.sendNotification(incomingNumber!!, "Call from $displayMessage @ $currentTime", "Call", context)
                 } else {
                     Log.d("CallReceiver", "Incoming call number is null or empty.")
                 }
