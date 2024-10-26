@@ -79,4 +79,4 @@ __Webhook Notifications__
 - Verify that the email configuration is correct and that the app can access the internet to send emails.
 
 # License
-This project is licensed under the [WTFPL License](http://www.wtfpl.net). This license allows you to freely use, modify, and distribute the software. For more details, see the [WTFPL License](http://www.wtfpl.net)
+This project is licensed under the WTFPL. This license allows you to freely use, modify, and distribute the software. For more details, see the [WTFPL License](http://www.wtfpl.net).
