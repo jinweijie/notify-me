@@ -299,5 +299,102 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
+        <!-- HTTP Configuration Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
+
+            <CheckBox
+                android:id="@+id/cb_enable_http"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enable HTTP Notification" />
+
+            <LinearLayout
+                android:id="@+id/layout_http_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/tv_http_section_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HTTP Configuration"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_http_endpoint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HTTP Endpoint URL: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_http_endpoint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter HTTP Endpoint URL"
+                    android:inputType="textUri" />
+
+                <TextView
+                    android:id="@+id/tv_http_headers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HTTP Headers: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_http_headers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Headers in JSON Format"
+                    android:inputType="textMultiLine" />
+
+                <TextView
+                    android:id="@+id/tv_http_body_template"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HTTP Body Template: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_http_body_template"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Body in JSON Format"
+                    android:inputType="textMultiLine" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <Button
+                        android:id="@+id/btn_save_http"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Save HTTP Settings" />
+
+                    <Button
+                        android:id="@+id/btn_test_http"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Test HTTP" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

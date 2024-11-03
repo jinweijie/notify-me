@@ -47,6 +47,15 @@ class MainActivity : ComponentActivity() {
     private lateinit var btnSaveWebhook: Button
     private lateinit var btnTestWebhook: Button
 
+    // HTTP UI elements
+    private lateinit var cbEnableHttp: CheckBox
+    private lateinit var layoutHttpContent: LinearLayout
+    private lateinit var etHttpEndpoint: EditText
+    private lateinit var etHttpHeaders: EditText
+    private lateinit var etHttpBodyTemplate: EditText
+    private lateinit var btnSaveHttp: Button
+    private lateinit var btnTestHttp: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -86,6 +95,15 @@ class MainActivity : ComponentActivity() {
         etWebhookHeaders = findViewById(R.id.et_webhook_headers)
         btnSaveWebhook = findViewById(R.id.btn_save_webhook)
         btnTestWebhook = findViewById(R.id.btn_test_webhook)
+
+        // Initialize HTTP UI elements
+        cbEnableHttp = findViewById(R.id.cb_enable_http)
+        layoutHttpContent = findViewById(R.id.layout_http_content)
+        etHttpEndpoint = findViewById(R.id.et_http_endpoint)
+        etHttpHeaders = findViewById(R.id.et_http_headers)
+        etHttpBodyTemplate = findViewById(R.id.et_http_body_template)
+        btnSaveHttp = findViewById(R.id.btn_save_http)
+        btnTestHttp = findViewById(R.id.btn_test_http)
 
         // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
@@ -136,6 +154,18 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Test webhook sent.", Toast.LENGTH_LONG).show()
         }
 
+        // Set click listener on Save and Test buttons for HTTP configuration
+        btnSaveHttp.setOnClickListener {
+            saveHttpSettings()
+            Toast.makeText(this, "HTTP settings saved.", Toast.LENGTH_LONG).show()
+        }
+
+        btnTestHttp.setOnClickListener {
+            saveHttpSettings()
+            Utils.sendHttp("Tester", "This is a test message", "SMS", this)
+            Toast.makeText(this, "Test HTTP sent.", Toast.LENGTH_LONG).show()
+        }
+
         // Set change listeners for checkboxes
         cbEnableBark.setOnCheckedChangeListener { _, isChecked ->
             layoutBarkContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
@@ -150,6 +180,11 @@ class MainActivity : ComponentActivity() {
         cbEnableWebhook.setOnCheckedChangeListener { _, isChecked ->
             layoutWebhookContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
             saveBooleanConfig("enable_webhook", isChecked)
+        }
+
+        cbEnableHttp.setOnCheckedChangeListener { _, isChecked ->
+            layoutHttpContent.visibility = if (isChecked) LinearLayout.VISIBLE else LinearLayout.GONE
+            saveBooleanConfig("enable_http", isChecked)
         }
     }
 
@@ -191,6 +226,18 @@ class MainActivity : ComponentActivity() {
         saveConfig("webhook_headers", webhookHeaders)
     }
 
+    private fun saveHttpSettings() {
+        val httpEndpoint = etHttpEndpoint.text.toString().trim()
+        if (httpEndpoint.isNotEmpty()) {
+            saveConfig("http_endpoint", httpEndpoint)
+        }
+
+        val httpHeaders = etHttpHeaders.text.toString().trim()
+        saveConfig("http_headers", httpHeaders)
+
+        val httpBodyTemplate = etHttpBodyTemplate.text.toString().trim()
+        saveConfig("http_body_template", httpBodyTemplate)
+    }
     private fun loadSavedSettings() {
         // Load Bark settings
         val isBarkEnabled = sharedPreferences.getBoolean("enable_bark", false)
@@ -231,6 +278,19 @@ class MainActivity : ComponentActivity() {
 
         etWebhookEndpoint.setText(webhookEndpoint)
         etWebhookHeaders.setText(webhookHeaders)
+
+        // Load HTTP settings
+        val isHttpEnabled = sharedPreferences.getBoolean("enable_http", false)
+        cbEnableHttp.isChecked = isHttpEnabled
+        layoutHttpContent.visibility = if (isHttpEnabled) LinearLayout.VISIBLE else LinearLayout.GONE
+
+        val httpEndpoint = sharedPreferences.getString("http_endpoint", "")
+        val httpHeaders = sharedPreferences.getString("http_headers", "")
+        val httpBodyTemplate = sharedPreferences.getString("http_body_template", """{"type": "<TYPE>", "sender":"<SENDER>", "message":"<MESSAGE>", "timestamp":"<TIMESTAMP>"}""")
+
+        etHttpEndpoint.setText(httpEndpoint)
+        etHttpHeaders.setText(httpHeaders)
+        etHttpBodyTemplate.setText(httpBodyTemplate)
     }
 
     private fun saveConfig(key: String, value: String) {

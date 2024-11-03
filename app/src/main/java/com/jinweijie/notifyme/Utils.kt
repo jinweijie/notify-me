@@ -10,6 +10,9 @@ import org.json.JSONObject
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 import java.util.Properties
 import javax.mail.Message
@@ -32,6 +35,7 @@ object Utils {
         val isBarkEnabled = sharedPreferences.getBoolean("enable_bark", false)
         val isEmailEnabled = sharedPreferences.getBoolean("enable_email", false)
         val isWebhookEnabled = sharedPreferences.getBoolean("enable_webhook", false)
+        val isHttpEnabled = sharedPreferences.getBoolean("enable_http", false)
 
         if(isBarkEnabled)
             sendBark(sender, message, type, context)
@@ -41,6 +45,9 @@ object Utils {
 
         if(isWebhookEnabled)
             sendWebhook(sender, message, type, context)
+
+        if (isHttpEnabled)
+            sendHttp(sender, message, type, context)
     }
 
     fun sendBark(sender: String, message: String, type: String, context: Context?) {
@@ -276,6 +283,96 @@ object Utils {
                 Log.e("sendWebhook", "IO error", e)
             } catch (e: Exception) {
                 Log.e("sendWebhook", "Unexpected error", e)
+            }
+        }.start() // Starting the thread
+    }
+
+    fun sendHttp(sender: String, message: String, type: String, context: Context?) {
+        // Run network operation in a background thread
+        Thread {
+            try {
+                val sharedPreferences = context?.getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
+                val httpEndpoint = sharedPreferences?.getString("http_endpoint", null)
+                val httpHeadersJson = sharedPreferences?.getString("http_headers", "")
+                val httpBodyTemplate = sharedPreferences?.getString("http_body_template", "{}")
+                    ?: "{}"
+
+                // Check if the HTTP endpoint is configured
+                if (httpEndpoint.isNullOrEmpty()) {
+                    Log.e("sendHttp", "HTTP endpoint is not configured.")
+                    return@Thread
+                }
+
+                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val currentTime = sdf.format(Date())
+
+                // Prepare the JSON payload by replacing placeholders
+                val httpBody = httpBodyTemplate
+                    .replace("<TYPE>", type)
+                    .replace("<SENDER>", sender)
+                    .replace("<MESSAGE>", message)
+                    .replace("<TIMESTAMP>", currentTime)
+
+                Log.i("sendHttp", "HTTP Endpoint: $httpEndpoint")
+                Log.i("sendHttp", "HTTP Body: $httpBody")
+
+                // Send POST request
+                val url = URL(httpEndpoint)
+                val urlConnection = url.openConnection() as HttpURLConnection
+                urlConnection.requestMethod = "POST"
+                urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                urlConnection.doOutput = true
+
+                // Parse and add headers
+                httpHeadersJson?.let {
+                    if (it.isNotEmpty()) {
+                        try {
+                            val headers = JSONObject(it)
+                            headers.keys().forEach { key ->
+                                val value = headers.getString(key)
+                                urlConnection.setRequestProperty(key, value)
+                            }
+                        } catch (e: JSONException) {
+                            Log.e("sendHttp", "Invalid JSON for headers: $httpHeadersJson", e)
+                        }
+                    }
+                }
+
+                // Write the body to the request
+                val outputStream: OutputStream = BufferedOutputStream(urlConnection.outputStream)
+                outputStream.use {
+                    it.write(httpBody.toByteArray())
+                    it.flush()
+                }
+
+                // Check the response
+                val responseCode = urlConnection.responseCode
+                val response = StringBuilder()
+
+                Log.i("sendHttp", "Response Code: $responseCode")
+
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val reader = BufferedReader(InputStreamReader(urlConnection.inputStream))
+                    reader.use {
+                        it.lines().forEach { line -> response.append(line) }
+                    }
+                    Log.i("sendHttp", "HTTP request sent successfully: $response")
+                } else {
+                    val errorReader = BufferedReader(InputStreamReader(urlConnection.errorStream))
+                    errorReader.use {
+                        it.lines().forEach { line -> response.append(line) }
+                    }
+                    Log.e("sendHttp", "Failed to send HTTP request: $responseCode, Response: $response")
+                }
+
+                urlConnection.disconnect()
+
+            } catch (e: FileNotFoundException) {
+                Log.e("sendHttp", "File not found error", e)
+            } catch (e: IOException) {
+                Log.e("sendHttp", "IO error", e)
+            } catch (e: Exception) {
+                Log.e("sendHttp", "Unexpected error", e)
             }
         }.start() // Starting the thread
     }
