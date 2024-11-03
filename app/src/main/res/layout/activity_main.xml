@@ -278,6 +278,21 @@
                     android:hint="Enter Headers in JSON Format"
                     android:inputType="textMultiLine" />
 
+                <TextView
+                    android:id="@+id/tv_webhook_body_template"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Webhook Body Template: "
+                    android:textSize="16sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/et_webhook_body_template"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Body in JSON Format"
+                    android:inputType="textMultiLine" />
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

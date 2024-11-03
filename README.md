@@ -7,6 +7,7 @@ This Android application captures incoming calls and SMS messages, and forwards 
 - Forward call and SMS information to a Bark server.
 - Send email notifications with call and SMS information.
 - Forward call and SMS information to a custom webhook endpoint.
+- Forward call and SMS information to a custom HTTP(S) endpoint.
 - Receive notifications on other devices using the Bark app.
 - Dual SIM card support.
 
@@ -27,6 +28,10 @@ __Bark Notifications__
 __Webhook Notifications__
 
 <img src="./screenshots/screenshot4.png" height="300">
+
+__HTTP Notifications__
+
+<img src="./screenshots/screenshot5.png" height="300">
 
 ## Prerequisites (Optional if only using Email or Webhook notifications)
 1. **Bark Server Setup**: Set up your Bark server by following the instructions provided in the [Bark Server GitHub repository](https://github.com/Finb/bark-server/blob/master/README.md).
@@ -62,10 +67,18 @@ __Webhook Notifications__
    - Open the app and navigate to the webhook configuration section.
    - Provide the **Webhook Endpoint URL** where incoming call and SMS information should be forwarded.
    - Optionally, you can add **Webhook Headers** (e.g., authentication tokens) to include in the HTTP request.
+   - You can also specify the Webhook body template. Default is `{"type": "<TYPE>", "sender":"<SENDER>", "message":"<MESSAGE>", "timestamp":"<TIMESTAMP>"}`.
+   
+4. **Configure HTTP**
+   - Open the app and navigate to the HTTP configuration section.
+   - Provide the **HTTP Endpoint URL** where incoming call and SMS information should be forwarded.
+   - Optionally, you can add **HTTP Headers** (e.g., authentication tokens) to include in the HTTP request.
+   - You can also specify the HTTP body template. Default is `{"type": "<TYPE>", "sender":"<SENDER>", "message":"<MESSAGE>", "timestamp":"<TIMESTAMP>"}`.
+   
 
 ## Usage
 - Once installed and configured, the app will run in the background.
-- It will capture incoming calls and SMS messages and automatically forward them to the configured Bark server, via email, or through the webhook endpoint.
+- It will capture incoming calls and SMS messages and automatically forward them to the configured Bark server, via email, or through the webhook or HTTP endpoint.
 - Notifications will be sent to devices that have the Bark app installed, to the configured email address, or to the webhook server.
 
 ## Notes

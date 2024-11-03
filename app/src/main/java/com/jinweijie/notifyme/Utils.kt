@@ -208,24 +208,24 @@ object Utils {
 
                 // Retrieve webhook headers from SharedPreferences (optional)
                 val webhookHeadersJson = sharedPreferences?.getString("webhook_headers", "")
-
+                val webhookBodyTemplate = sharedPreferences?.getString("http_body_template", defaultWebhookBodyTemplate)
+                    ?: defaultWebhookBodyTemplate
                 // Check if the webhook URL is valid before proceeding
                 if (webhookUrl.isNullOrEmpty()) {
                     Log.e("sendWebhook", "Webhook URL is not configured.")
                     return@Thread
                 }
 
+                val webhookBody = webhookBodyTemplate
+                    .replace("<TYPE>", type)
+                    .replace("<SENDER>", sender)
+                    .replace("<MESSAGE>", message)
+                    .replace("<TIMESTAMP>", getCurrentTime())
+
                 // Prepare the payload for the webhook
-                val jsonPayload = """
-                {
-                    "sender": "${sender.ifEmpty { "Unknown Sender" }}",
-                    "message": "${message.ifEmpty { "No message content" }}",
-                    "type": "$type"
-                }
-            """.trimIndent()
 
                 Log.i("sendWebhook", "Webhook URL: $webhookUrl")
-                Log.i("sendWebhook", "Json Payload: $jsonPayload")
+                Log.i("sendWebhook", "Json Payload: $webhookBody")
 
                 // Send POST request
                 val url = URL(webhookUrl)
@@ -251,7 +251,7 @@ object Utils {
 
                 val outputStream: OutputStream = BufferedOutputStream(urlConnection.outputStream)
                 outputStream.use {
-                    it.write(jsonPayload.toByteArray())
+                    it.write(webhookBody.toByteArray())
                     it.flush()
                 }
 
@@ -294,8 +294,8 @@ object Utils {
                 val sharedPreferences = context?.getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
                 val httpEndpoint = sharedPreferences?.getString("http_endpoint", null)
                 val httpHeadersJson = sharedPreferences?.getString("http_headers", "")
-                val httpBodyTemplate = sharedPreferences?.getString("http_body_template", "{}")
-                    ?: "{}"
+                val httpBodyTemplate = sharedPreferences?.getString("http_body_template", defaultHttpBodyTemplate)
+                    ?: defaultHttpBodyTemplate
 
                 // Check if the HTTP endpoint is configured
                 if (httpEndpoint.isNullOrEmpty()) {
@@ -303,15 +303,13 @@ object Utils {
                     return@Thread
                 }
 
-                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                val currentTime = sdf.format(Date())
 
                 // Prepare the JSON payload by replacing placeholders
                 val httpBody = httpBodyTemplate
                     .replace("<TYPE>", type)
                     .replace("<SENDER>", sender)
                     .replace("<MESSAGE>", message)
-                    .replace("<TIMESTAMP>", currentTime)
+                    .replace("<TIMESTAMP>", getCurrentTime())
 
                 Log.i("sendHttp", "HTTP Endpoint: $httpEndpoint")
                 Log.i("sendHttp", "HTTP Body: $httpBody")
@@ -375,6 +373,12 @@ object Utils {
                 Log.e("sendHttp", "Unexpected error", e)
             }
         }.start() // Starting the thread
+    }
+
+    fun getCurrentTime(): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val currentTime = sdf.format(Date())
+        return currentTime
     }
 
     @SuppressLint("MissingPermission")
