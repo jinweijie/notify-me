@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var etWebhookEndpoint: EditText
     private lateinit var etWebhookHeaders: EditText
     private lateinit var etWebhookBodyTemplate: EditText
+    private lateinit var cbWebhookPostAsFormUrlencoded: CheckBox
     private lateinit var btnSaveWebhook: Button
     private lateinit var btnTestWebhook: Button
 
@@ -54,6 +55,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var etHttpEndpoint: EditText
     private lateinit var etHttpHeaders: EditText
     private lateinit var etHttpBodyTemplate: EditText
+    private lateinit var cbHttpPostAsFormUrlencoded: CheckBox
     private lateinit var btnSaveHttp: Button
     private lateinit var btnTestHttp: Button
 
@@ -95,6 +97,7 @@ class MainActivity : ComponentActivity() {
         etWebhookEndpoint = findViewById(R.id.et_webhook_endpoint)
         etWebhookHeaders = findViewById(R.id.et_webhook_headers)
         etWebhookBodyTemplate = findViewById(R.id.et_webhook_body_template)
+        cbWebhookPostAsFormUrlencoded = findViewById(R.id.cb_webhook_post_as_form_urlencoded)
         btnSaveWebhook = findViewById(R.id.btn_save_webhook)
         btnTestWebhook = findViewById(R.id.btn_test_webhook)
 
@@ -104,6 +107,7 @@ class MainActivity : ComponentActivity() {
         etHttpEndpoint = findViewById(R.id.et_http_endpoint)
         etHttpHeaders = findViewById(R.id.et_http_headers)
         etHttpBodyTemplate = findViewById(R.id.et_http_body_template)
+        cbHttpPostAsFormUrlencoded = findViewById(R.id.cb_http_post_as_form_urlencoded)
         btnSaveHttp = findViewById(R.id.btn_save_http)
         btnTestHttp = findViewById(R.id.btn_test_http)
 
@@ -229,6 +233,8 @@ class MainActivity : ComponentActivity() {
 
         val webhookBodyTemplate = etWebhookBodyTemplate.text.toString().trim()
         saveConfig("webhook_body_template", webhookBodyTemplate)
+
+        saveBooleanConfig("webhook_post_as_form_url_encoded", cbWebhookPostAsFormUrlencoded.isChecked)
     }
 
     private fun saveHttpSettings() {
@@ -242,6 +248,8 @@ class MainActivity : ComponentActivity() {
 
         val httpBodyTemplate = etHttpBodyTemplate.text.toString().trim()
         saveConfig("http_body_template", httpBodyTemplate)
+
+        saveBooleanConfig("http_post_as_form_url_encoded", cbHttpPostAsFormUrlencoded.isChecked)
     }
 
     private fun loadSavedSettings() {
@@ -286,6 +294,7 @@ class MainActivity : ComponentActivity() {
         etWebhookEndpoint.setText(webhookEndpoint)
         etWebhookHeaders.setText(webhookHeaders)
         etWebhookBodyTemplate.setText(webhookBodyTemplate)
+        cbWebhookPostAsFormUrlencoded.isChecked = sharedPreferences.getBoolean("webhook_post_as_form_url_encoded", false)
 
         // Load HTTP settings
         val isHttpEnabled = sharedPreferences.getBoolean("enable_http", false)
@@ -299,6 +308,7 @@ class MainActivity : ComponentActivity() {
         etHttpEndpoint.setText(httpEndpoint)
         etHttpHeaders.setText(httpHeaders)
         etHttpBodyTemplate.setText(httpBodyTemplate)
+        cbHttpPostAsFormUrlencoded.isChecked = sharedPreferences.getBoolean("http_post_as_form_url_encoded", false)
     }
 
     private fun saveConfig(key: String, value: String) {

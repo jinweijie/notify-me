@@ -10,6 +10,7 @@ import org.json.JSONObject
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -208,8 +209,10 @@ object Utils {
 
                 // Retrieve webhook headers from SharedPreferences (optional)
                 val webhookHeadersJson = sharedPreferences?.getString("webhook_headers", "")
-                val webhookBodyTemplate = sharedPreferences?.getString("http_body_template", defaultWebhookBodyTemplate)
+                val webhookBodyTemplate = sharedPreferences?.getString("webhook_body_template", defaultWebhookBodyTemplate)
                     ?: defaultWebhookBodyTemplate
+                val webhookPostAsFormUrlEncoded = sharedPreferences?.getBoolean("webhook_post_as_form_url_encoded", false)
+
                 // Check if the webhook URL is valid before proceeding
                 if (webhookUrl.isNullOrEmpty()) {
                     Log.e("sendWebhook", "Webhook URL is not configured.")
@@ -222,19 +225,16 @@ object Utils {
                     .replace("<MESSAGE>", message)
                     .replace("<TIMESTAMP>", getCurrentTime())
 
-                // Prepare the payload for the webhook
-
                 Log.i("sendWebhook", "Webhook URL: $webhookUrl")
-                Log.i("sendWebhook", "Json Payload: $webhookBody")
+                Log.i("sendWebhook", "Payload: $webhookBody")
 
                 // Send POST request
                 val url = URL(webhookUrl)
                 val urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "POST"
-                urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                 urlConnection.doOutput = true
 
-                // Parse webhook headers from JSON and add them to the request (if provided)
+                // Set headers
                 webhookHeadersJson?.let {
                     if (it.isNotEmpty()) {
                         try {
@@ -249,10 +249,23 @@ object Utils {
                     }
                 }
 
-                val outputStream: OutputStream = BufferedOutputStream(urlConnection.outputStream)
-                outputStream.use {
-                    it.write(webhookBody.toByteArray())
-                    it.flush()
+                if (webhookPostAsFormUrlEncoded == true) {
+                    // Form URL Encoded
+                    urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                    val formEncodedBody = "type=${URLEncoder.encode(type, "UTF-8")}" +
+                            "&sender=${URLEncoder.encode(sender, "UTF-8")}" +
+                            "&message=${URLEncoder.encode(message, "UTF-8")}" +
+                            "&timestamp=${URLEncoder.encode(getCurrentTime(), "UTF-8")}"
+
+                    urlConnection.outputStream.use {
+                        it.write(formEncodedBody.toByteArray())
+                    }
+                } else {
+                    // JSON Encoded
+                    urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                    urlConnection.outputStream.use {
+                        it.write(webhookBody.toByteArray())
+                    }
                 }
 
                 // Check the response
@@ -296,6 +309,7 @@ object Utils {
                 val httpHeadersJson = sharedPreferences?.getString("http_headers", "")
                 val httpBodyTemplate = sharedPreferences?.getString("http_body_template", defaultHttpBodyTemplate)
                     ?: defaultHttpBodyTemplate
+                val httpPostAsFormUrlEncoded = sharedPreferences?.getBoolean("http_post_as_form_url_encoded", false)
 
                 // Check if the HTTP endpoint is configured
                 if (httpEndpoint.isNullOrEmpty()) {
@@ -303,8 +317,7 @@ object Utils {
                     return@Thread
                 }
 
-
-                // Prepare the JSON payload by replacing placeholders
+                // Prepare the payload by replacing placeholders
                 val httpBody = httpBodyTemplate
                     .replace("<TYPE>", type)
                     .replace("<SENDER>", sender)
@@ -318,10 +331,9 @@ object Utils {
                 val url = URL(httpEndpoint)
                 val urlConnection = url.openConnection() as HttpURLConnection
                 urlConnection.requestMethod = "POST"
-                urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
                 urlConnection.doOutput = true
 
-                // Parse and add headers
+                // Set headers
                 httpHeadersJson?.let {
                     if (it.isNotEmpty()) {
                         try {
@@ -336,11 +348,23 @@ object Utils {
                     }
                 }
 
-                // Write the body to the request
-                val outputStream: OutputStream = BufferedOutputStream(urlConnection.outputStream)
-                outputStream.use {
-                    it.write(httpBody.toByteArray())
-                    it.flush()
+                if (httpPostAsFormUrlEncoded == true) {
+                    // Form URL Encoded
+                    urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                    val formEncodedBody = "type=${URLEncoder.encode(type, "UTF-8")}" +
+                            "&sender=${URLEncoder.encode(sender, "UTF-8")}" +
+                            "&message=${URLEncoder.encode(message, "UTF-8")}" +
+                            "&timestamp=${URLEncoder.encode(getCurrentTime(), "UTF-8")}"
+
+                    urlConnection.outputStream.use {
+                        it.write(formEncodedBody.toByteArray())
+                    }
+                } else {
+                    // JSON Encoded
+                    urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                    urlConnection.outputStream.use {
+                        it.write(httpBody.toByteArray())
+                    }
                 }
 
                 // Check the response
