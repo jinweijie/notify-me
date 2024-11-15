@@ -19,6 +19,14 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var sharedPreferences: SharedPreferences
 
+    // General configuration UI elements
+    private lateinit var etSmsSubjectTemplate: EditText
+    private lateinit var etSmsContentTemplate: EditText
+    private lateinit var etPhoneSubjectTemplate: EditText
+    private lateinit var etPhoneContentTemplate: EditText
+    private lateinit var btnSaveGeneral: Button
+    private lateinit var btnUseDefaultGeneral: Button
+
     // Bark UI elements
     private lateinit var cbEnableBark: CheckBox
     private lateinit var layoutBarkContent: LinearLayout
@@ -71,6 +79,14 @@ class MainActivity : ComponentActivity() {
     private fun initializeUi() {
         setContentView(R.layout.activity_main)
 
+        // Initialize General Configuration UI elements
+        etSmsSubjectTemplate = findViewById<EditText>(R.id.et_sms_subject_template)
+        etSmsContentTemplate = findViewById<EditText>(R.id.et_sms_content_template)
+        etPhoneSubjectTemplate = findViewById<EditText>(R.id.et_phone_subject_template)
+        etPhoneContentTemplate = findViewById<EditText>(R.id.et_phone_content_template)
+        btnSaveGeneral = findViewById<Button>(R.id.btn_save_general)
+        btnUseDefaultGeneral = findViewById<Button>(R.id.btn_use_default_general)
+
         // Initialize Bark UI elements
         cbEnableBark = findViewById(R.id.cb_enable_bark)
         layoutBarkContent = findViewById(R.id.layout_bark_content)
@@ -116,6 +132,23 @@ class MainActivity : ComponentActivity() {
 
         // Load and display the current settings
         loadSavedSettings()
+
+        // Set click listener on the Save button for General configuration
+        btnSaveGeneral.setOnClickListener {
+            saveGeneralSettings()
+           
+            Toast.makeText(this, "General settings saved.", Toast.LENGTH_LONG).show()
+        }
+        // Set click listener on the Use Default button for General configuration
+        btnUseDefaultGeneral.setOnClickListener {
+            etSmsSubjectTemplate.setText("[{{TYPE}}] {{SENDER}}")
+            etSmsContentTemplate.setText("{{MESSAGE}}")
+            etPhoneSubjectTemplate.setText("[{{TYPE}}] {{SENDER}}")
+            etPhoneContentTemplate.setText("Call from {{MESSAGE}} @ {{TIME}}")
+            
+            saveGeneralSettings()
+            Toast.makeText(this, "Default templates applied and saved.", Toast.LENGTH_LONG).show()
+        }
 
         // Set click listener on the Save button for Bark configuration
         btnSaveBark.setOnClickListener {
@@ -194,6 +227,18 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun saveGeneralSettings() {
+        val smsSubjectTemplate = etSmsSubjectTemplate.text.toString().trim()
+        val smsContentTemplate = etSmsContentTemplate.text.toString().trim()
+        val phoneSubjectTemplate = etPhoneSubjectTemplate.text.toString().trim()
+        val phoneContentTemplate = etPhoneContentTemplate.text.toString().trim()
+
+        saveConfig("sms_subject_template", smsSubjectTemplate)
+        saveConfig("sms_content_template", smsContentTemplate)
+        saveConfig("phone_subject_template", phoneSubjectTemplate)
+        saveConfig("phone_content_template", phoneContentTemplate)
+    }
+
     private fun saveBarkSettings() {
         val newEndpoint = etEndpoint.text.toString().trim()
         if (newEndpoint.isNotEmpty()) {
@@ -253,6 +298,18 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun loadSavedSettings() {
+
+        // Load General settings
+        val smsSubjectTemplate = sharedPreferences.getString("sms_subject_template", "[{{TYPE}}] {{SENDER}}")
+        val smsContentTemplate = sharedPreferences.getString("sms_content_template", "{{MESSAGE}}")
+        val phoneSubjectTemplate = sharedPreferences.getString("phone_subject_template", "[{{TYPE}}] {{SENDER}}")
+        val phoneContentTemplate = sharedPreferences.getString("phone_content_template", "Call from {{MESSAGE}} @ {{TIME}}")
+
+        etSmsSubjectTemplate.setText(smsSubjectTemplate)
+        etSmsContentTemplate.setText(smsContentTemplate)
+        etPhoneSubjectTemplate.setText(phoneSubjectTemplate)
+        etPhoneContentTemplate.setText(phoneContentTemplate)
+
         // Load Bark settings
         val isBarkEnabled = sharedPreferences.getBoolean("enable_bark", false)
         cbEnableBark.isChecked = isBarkEnabled

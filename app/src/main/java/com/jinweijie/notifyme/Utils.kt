@@ -32,17 +32,49 @@ object Utils {
             return
         }
 
+        var subject = sender
+        var content = message
         val sharedPreferences = context.getSharedPreferences("AppConfig", Context.MODE_PRIVATE)
+        if(type == "SMS"){
+            val smsSubjectTemplate = sharedPreferences?.getString("sms_subject_template", "[{{TYPE}}] {{SENDER}}")
+            val smsContentTemplate = sharedPreferences?.getString("sms_content_template", "{{MESSAGE}}")
+
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val currentTime = sdf.format(Date())
+
+            subject = smsSubjectTemplate?.replace("{{SENDER}}", sender)
+                ?.replace("{{TIME}}", currentTime)
+                ?.replace("{{TYPE}}", type)!!
+
+            content = smsContentTemplate?.replace("{{MESSAGE}}", message)
+                ?.replace("{{TIME}}", currentTime)
+                ?.replace("{{TYPE}}", type)!!
+        }
+        else if(type == "Call"){
+            val phoneSubjectTemplate = sharedPreferences.getString("phone_subject_template", "[{{TYPE}}] {{SENDER}}")
+            val phoneContentTemplate = sharedPreferences.getString("phone_content_template", "Call from {{MESSAGE}} @ {{TIME}}")
+
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val currentTime = sdf.format(Date())
+
+            subject = phoneSubjectTemplate?.replace("{{SENDER}}", sender)
+                ?.replace("{{TIME}}", currentTime)
+                ?.replace("{{TYPE}}", type)!!
+            content = phoneContentTemplate?.replace("{{MESSAGE}}", message)
+                ?.replace("{{TIME}}", currentTime)
+                ?.replace("{{TYPE}}", type)!!
+        }
+
         val isBarkEnabled = sharedPreferences.getBoolean("enable_bark", false)
         val isEmailEnabled = sharedPreferences.getBoolean("enable_email", false)
         val isWebhookEnabled = sharedPreferences.getBoolean("enable_webhook", false)
         val isHttpEnabled = sharedPreferences.getBoolean("enable_http", false)
 
         if(isBarkEnabled)
-            sendBark(sender, message, type, context)
+            sendBark(subject, content, type, context)
 
         if(isEmailEnabled)
-            sendEmail(sender, message, type, context)
+            sendEmail(subject, content, type, context)
 
         if(isWebhookEnabled)
             sendWebhook(sender, message, type, context)
@@ -51,7 +83,7 @@ object Utils {
             sendHttp(sender, message, type, context)
     }
 
-    fun sendBark(sender: String, message: String, type: String, context: Context?) {
+    fun sendBark(subject: String, content: String, type: String, context: Context?) {
         // Run network operation in a background thread
         Thread {
             try {
@@ -79,8 +111,8 @@ object Utils {
                 // Prepare the payload for the Bark server
                 val jsonPayload = """
                     {
-                        "title": "${sender ?: "Unknown Sender"}",
-                        "body": "${message ?: "No message content"}",
+                        "title": "${subject ?: "Unknown Sender"}",
+                        "body": "${content ?: "No message content"}",
                         "category": "$type",
                         "device_key": "$deviceKey"
                     }
@@ -134,7 +166,7 @@ object Utils {
         }.start() // Starting the thread
     }
 
-    fun sendEmail(mailSubject: String, message: String, type: String, context: Context?) {
+    fun sendEmail(mailSubject: String, content: String, type: String, context: Context?) {
         if (context == null) {
             Log.e("sendEmail", "Context is null")
             return
@@ -183,8 +215,8 @@ object Utils {
                 val mimeMessage = MimeMessage(session).apply {
                     setFrom(InternetAddress(username))
                     setRecipient(Message.RecipientType.TO, InternetAddress(recipient))
-                    subject = "[$type] $mailSubject"
-                    setText(message)
+                    subject = mailSubject
+                    setText(content)
                 }
 
                 // Send the email

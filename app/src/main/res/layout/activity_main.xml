@@ -9,6 +9,96 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- General Configuration Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="General Configuration"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingBottom="8dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SMS Subject Template"
+                android:textSize="14sp"
+                android:paddingTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_sms_subject_template"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="SMS Subject Template"
+                android:inputType="textMultiLine"
+                android:minLines="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SMS Content Template"
+                android:textSize="14sp"
+                android:paddingTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_sms_content_template"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="SMS Content Template"
+                android:inputType="textMultiLine"
+                android:minLines="2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone Subject Template"
+                android:textSize="14sp"
+                android:paddingTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_phone_subject_template"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone Subject Template"
+                android:inputType="textMultiLine"
+                android:minLines="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone Content Template"
+                android:textSize="14sp"
+                android:paddingTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_phone_content_template"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone Content Template"
+                android:inputType="textMultiLine"
+                android:minLines="2" />
+
+            <Button
+                android:id="@+id/btn_save_general"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Save General Settings" />
+
+            <Button
+                android:id="@+id/btn_use_default_general"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Use Default Templates" />
+
+        </LinearLayout>
+
         <!-- Bark Configuration Section -->
         <LinearLayout
             android:layout_width="match_parent"

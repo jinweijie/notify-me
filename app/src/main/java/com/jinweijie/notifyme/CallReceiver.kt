@@ -39,11 +39,8 @@ class CallReceiver : BroadcastReceiver() {
                     Log.d("CallReceiver", "Incoming call from $displayMessage")
                     Toast.makeText(context, "Incoming call from $displayMessage", Toast.LENGTH_LONG).show()
 
-                    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    val currentTime = sdf.format(Date())
-
                     // Post the data
-                    Utils.sendNotification(incomingNumber!!, "Call from $displayMessage @ $currentTime", "Call", context)
+                    Utils.sendNotification(incomingNumber!!, displayMessage, "Call", context)
                 } else {
                     Log.d("CallReceiver", "Incoming call number is null or empty.")
                 }
