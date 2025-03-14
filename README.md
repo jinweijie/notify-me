@@ -93,3 +93,9 @@ __HTTP Notifications__
 
 # License
 This project is licensed under the WTFPL. This license allows you to freely use, modify, and distribute the software. For more details, see the [WTFPL License](http://www.wtfpl.net).
+
+## Donate
+
+If you would like to support my development, feel free to buy me a coffee, it makes a big difference! Thanks.
+
+<a href="https://www.buymeacoffee.com/jinweijie" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/white_img.png" alt="Buy Me A Coffee"></a>
