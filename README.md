@@ -94,7 +94,7 @@ __HTTP Notifications__
 # License
 This project is licensed under the WTFPL. This license allows you to freely use, modify, and distribute the software. For more details, see the [WTFPL License](http://www.wtfpl.net).
 
-## Donate
+# Donate
 
 If you would like to support my development, feel free to buy me a coffee, it makes a big difference! Thanks.
 
