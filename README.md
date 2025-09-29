@@ -41,6 +41,10 @@ __HTTP Notifications__
 2. You can also use the [Bark public server](https://bark.day.app/) if you don't want to set up your own. However, it is not recommended considering privacy.
 
 ## Installation Instructions
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" height="80" alt="Get it at IzzyOnDroid">](https://apt.izzysoft.de/packages/com.jinweijie.notifyme)
+
+Or:
+
 1. **Download the App**
    - Navigate to the [Releases](https://github.com/jinweijie/notify-me/releases) section of this repository.
    - Download the latest version of the APK.
